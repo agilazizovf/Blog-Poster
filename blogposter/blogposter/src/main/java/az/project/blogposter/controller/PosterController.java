@@ -72,11 +72,11 @@ public class PosterController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePoster(@PathVariable("id") Integer postId) {
+    public ResponseEntity<String> deletePoster(@PathVariable("id") Integer postId, @RequestParam Integer userId) {
         try {
-            posterService.deleteById(postId);
+            posterService.deleteById(postId, userId);
             return ResponseEntity.ok("Poster deleted successfully!.");
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | GeneralException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

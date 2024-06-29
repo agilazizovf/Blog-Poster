@@ -79,9 +79,15 @@ public class PosterService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteById(Integer postId) {
+    public void deleteById(Integer postId, Integer userId) {
         Poster poster = posterRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException("Poster not found with id: " + postId));
+
+        // Check if the user is the owner of the post
+        if (!poster.getPostedBy().getId().equals(userId)) {
+            throw new GeneralException("You are not authorized to delete this post.");
+        }
+
         posterRepository.deleteById(postId);
     }
 
