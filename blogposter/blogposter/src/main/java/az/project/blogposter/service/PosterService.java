@@ -5,6 +5,7 @@ import az.project.blogposter.dto.response.PosterResponseDTO;
 import az.project.blogposter.entity.Poster;
 import az.project.blogposter.entity.User;
 import az.project.blogposter.exception.GeneralException;
+import az.project.blogposter.repository.CommentRepository;
 import az.project.blogposter.repository.PosterRepository;
 import az.project.blogposter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class PosterService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     public PosterResponseDTO savePost(PosterRequestDTO posterRequestDTO) {
         User user = userRepository.findById(posterRequestDTO.getUserId())
@@ -87,7 +91,7 @@ public class PosterService {
         if (!poster.getPostedBy().getId().equals(userId)) {
             throw new GeneralException("You are not authorized to delete this post.");
         }
-
+        commentRepository.deleteByPosterId(postId);
         posterRepository.deleteById(postId);
     }
 
