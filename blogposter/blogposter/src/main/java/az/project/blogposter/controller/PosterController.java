@@ -2,6 +2,7 @@ package az.project.blogposter.controller;
 
 import az.project.blogposter.dto.request.PosterRequestDTO;
 import az.project.blogposter.dto.response.PosterResponseDTO;
+import az.project.blogposter.exception.GeneralException;
 import az.project.blogposter.service.PosterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,22 +41,22 @@ public class PosterController {
         }
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<?> findPosterById(@PathVariable Integer postId) {
+    @PutMapping("/{postId}/like")
+    public ResponseEntity<?> likePost(@PathVariable Integer postId, @RequestParam Integer userId) {
         try {
-            PosterResponseDTO poster = posterService.findPosterById(postId);
-            return ResponseEntity.ok(poster);
-        } catch (EntityNotFoundException e) {
+            posterService.likePost(postId, userId);
+            return ResponseEntity.ok("Post liked successfully.");
+        } catch (EntityNotFoundException | GeneralException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @PutMapping("/{postId}/like")
-    public ResponseEntity<?> likePost(@PathVariable Integer postId) {
+    @GetMapping("/{postId}")
+    public ResponseEntity<?> findPosterById(@PathVariable Integer postId, @RequestParam Integer userId) {
         try {
-            posterService.likePost(postId);
-            return ResponseEntity.ok("Post liked successfully.");
-        } catch (EntityNotFoundException e) {
+            PosterResponseDTO poster = posterService.findPosterById(postId, userId);
+            return ResponseEntity.ok(poster);
+        } catch (EntityNotFoundException | GeneralException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -31,6 +33,17 @@ public class Poster {
     private Integer likes = 0;
 
     private Integer views = 0;
+
+    @ElementCollection
+    @CollectionTable(name = "poster_likes", joinColumns = @JoinColumn(name = "poster_id"))
+    @Column(name = "user_id")
+    private Set<Integer> likedByUsers = new HashSet<>();
+
+    @ElementCollection
+    @CollectionTable(name = "poster_views", joinColumns = @JoinColumn(name = "poster_id"))
+    @Column(name = "user_id")
+    private Set<Integer> viewedByUsers = new HashSet<>();
+
 
 
 

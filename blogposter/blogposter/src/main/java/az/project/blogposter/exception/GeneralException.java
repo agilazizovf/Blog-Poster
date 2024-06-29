@@ -1,5 +1,6 @@
 package az.project.blogposter.exception;
 
+
 public class GeneralException extends RuntimeException{
 
     String message;

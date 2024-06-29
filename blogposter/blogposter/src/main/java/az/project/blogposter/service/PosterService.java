@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,19 +46,30 @@ public class PosterService {
                 .collect(Collectors.toList());
     }
 
-    public PosterResponseDTO findPosterById(Integer postId) {
-        Poster poster = posterRepository.findById(postId)
-                .orElseThrow(() -> new GeneralException("Poster not found with id: " + postId));
-        poster.setViews(poster.getViews() + 1);
-        posterRepository.save(poster);
-        return convertToResponseDTO(poster);
-    }
-
-    public void likePost(Integer postId) {
+    public void likePost(Integer postId, Integer userId) {
         Poster poster = posterRepository.findById(postId)
                 .orElseThrow(() -> new GeneralException("Post not found with id: " + postId));
-        poster.setLikes(poster.getLikes() + 1);
-        posterRepository.save(poster);
+
+        if (!poster.getLikedByUsers().contains(userId)) {
+            poster.setLikes(poster.getLikes() + 1);
+            poster.getLikedByUsers().add(userId);
+            posterRepository.save(poster);
+        } else {
+            throw new GeneralException("User with id " + userId + " has already liked this post.");
+        }
+    }
+
+    public PosterResponseDTO findPosterById(Integer postId, Integer userId) {
+        Poster poster = posterRepository.findById(postId)
+                .orElseThrow(() -> new GeneralException("Poster not found with id: " + postId));
+
+        if (!poster.getViewedByUsers().contains(userId)) {
+            poster.setViews(poster.getViews() + 1);
+            poster.getViewedByUsers().add(userId);
+            posterRepository.save(poster);
+        }
+
+        return convertToResponseDTO(poster);
     }
 
     public List<PosterResponseDTO> searchByName(String name) {
