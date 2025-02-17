@@ -24,9 +24,7 @@ public class Poster {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User postedBy;
-
-//    private String postedBy;
+    private Client postedBy;
 
     private Date creation_date;
 

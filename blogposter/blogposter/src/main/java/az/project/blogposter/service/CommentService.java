@@ -1,14 +1,14 @@
 package az.project.blogposter.service;
 
-import az.project.blogposter.dto.request.CommentRequestDTO;
-import az.project.blogposter.dto.response.CommentResponseDTO;
+import az.project.blogposter.model.dto.request.CommentRequestDTO;
+import az.project.blogposter.model.dto.response.CommentResponseDTO;
+import az.project.blogposter.entity.Client;
 import az.project.blogposter.entity.Comment;
 import az.project.blogposter.entity.Poster;
-import az.project.blogposter.entity.User;
-import az.project.blogposter.exception.GeneralException;
+import az.project.blogposter.model.exception.UserNotFoundException;
+import az.project.blogposter.repository.ClientRepository;
 import az.project.blogposter.repository.CommentRepository;
 import az.project.blogposter.repository.PosterRepository;
-import az.project.blogposter.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +26,13 @@ public class CommentService {
     private PosterRepository posterRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private ClientRepository clientRepository;
 
     public CommentResponseDTO createComment(CommentRequestDTO commentRequestDTO) {
-        User user = userRepository.findById(commentRequestDTO.getUserId())
-                .orElseThrow(() -> new GeneralException("User not found with id: " + commentRequestDTO.getUserId()));
+        Client user = clientRepository.findById(commentRequestDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + commentRequestDTO.getUserId()));
         Poster poster = posterRepository.findById(commentRequestDTO.getPosterId())
-                .orElseThrow(() -> new GeneralException("Poster not found with id: " + commentRequestDTO.getPosterId()));
+                .orElseThrow(() -> new UserNotFoundException("Poster not found with id: " + commentRequestDTO.getPosterId()));
 
         Comment comment = new Comment();
         comment.setContent(commentRequestDTO.getContent());

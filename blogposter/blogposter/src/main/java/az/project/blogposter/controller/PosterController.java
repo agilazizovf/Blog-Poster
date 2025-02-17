@@ -1,14 +1,12 @@
 package az.project.blogposter.controller;
 
-import az.project.blogposter.dto.request.PosterRequestDTO;
-import az.project.blogposter.dto.response.PosterResponseDTO;
-import az.project.blogposter.exception.GeneralException;
+import az.project.blogposter.model.dto.request.PosterRequestDTO;
+import az.project.blogposter.model.dto.response.PosterResponseDTO;
 import az.project.blogposter.service.PosterService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PosterController {
 
-    @Autowired
-    private PosterService posterService;
+
+    private final PosterService posterService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<List<PosterResponseDTO>> getAllPosters() {
         try {
             List<PosterResponseDTO> posters = posterService.getAllPosters();
@@ -32,52 +31,32 @@ public class PosterController {
     }
 
     @PostMapping(path = "/create-poster")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<PosterResponseDTO> createPoster(@RequestBody PosterRequestDTO posterRequestDTO) {
-        try {
-            PosterResponseDTO createdPost = posterService.savePost(posterRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+            return posterService.savePost(posterRequestDTO);
     }
 
     @PutMapping("/{postId}/like")
-    public ResponseEntity<?> likePost(@PathVariable Integer postId, @RequestParam Integer userId) {
-        try {
-            posterService.likePost(postId, userId);
-            return ResponseEntity.ok("Post liked successfully.");
-        } catch (EntityNotFoundException | GeneralException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public void likePost(@PathVariable Integer postId) {
+        posterService.like(postId);
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<?> findPosterById(@PathVariable Integer postId, @RequestParam Integer userId) {
-        try {
-            PosterResponseDTO poster = posterService.findPosterById(postId, userId);
-            return ResponseEntity.ok(poster);
-        } catch (EntityNotFoundException | GeneralException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<PosterResponseDTO> findPosterById(@PathVariable Integer postId) {
+        return posterService.findPosterById(postId);
     }
 
     @GetMapping("/search/{name}")
-    public ResponseEntity<?> searchByName(@PathVariable String name) {
-        try {
-            List<PosterResponseDTO> posters = posterService.searchByName(name);
-            return ResponseEntity.status(HttpStatus.OK).body(posters);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public List<PosterResponseDTO>searchByName(@PathVariable String name) {
+        return posterService.searchByName(name);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletePoster(@PathVariable("id") Integer postId, @RequestParam Integer userId) {
-        try {
-            posterService.deleteById(postId, userId);
-            return ResponseEntity.ok("Poster deleted successfully!.");
-        } catch (EntityNotFoundException | GeneralException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public void deletePoster(@PathVariable("id") Integer postId) {
+        posterService.deleteById(postId);
     }
 }

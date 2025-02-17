@@ -1,39 +1,52 @@
 package az.project.blogposter.entity;
 
+import az.project.blogposter.model.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-
-@Data
+@Table(name = "users")
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String firstName;
-
-    private String lastName;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false, unique = true)
+    @NotNull
     private String username;
-    @Column(nullable = false)
+
+    @NotNull
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
-    @JoinTable(name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn
-                    (name = "role_id",
-                            referencedColumnName = "id"))
-    private Collection<Role> roles;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(name = "user_authorities",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
+    private Set<Authority> authorities = new HashSet<>();
+
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user")
+    private Client client;
+
+    private Status status;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
 }

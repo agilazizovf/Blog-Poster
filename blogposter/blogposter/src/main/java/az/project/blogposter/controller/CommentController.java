@@ -1,7 +1,7 @@
 package az.project.blogposter.controller;
 
-import az.project.blogposter.dto.request.CommentRequestDTO;
-import az.project.blogposter.dto.response.CommentResponseDTO;
+import az.project.blogposter.model.dto.request.CommentRequestDTO;
+import az.project.blogposter.model.dto.response.CommentResponseDTO;
 import az.project.blogposter.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

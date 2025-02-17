@@ -21,7 +21,7 @@ public class Comment {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User postedBy;
+    private Client postedBy;
 
 //    private String postedBy;
 
